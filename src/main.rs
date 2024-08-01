@@ -16,3 +16,7 @@ mod tests {
         assert_eq!(result, 6);
     }
 }
+
+fn foo() -> String {
+    "Hello World".to_string()
+}
