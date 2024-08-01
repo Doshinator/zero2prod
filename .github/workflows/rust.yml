@@ -19,10 +19,14 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
-      - name: Install tarpaulin
+      - name: Install nightly
         run: rustup update nightly
+
+      - name: Add nightly
         run: rustup target add wasm32-unknown-unknown --toolchain nightly
-        run: cargo install cargo-tarpaulin 
+
+      - name: Install tarpaulin
+        run: cargo install cargo-tarpaulin
 
       - name: Generate code coverage
         run: |
