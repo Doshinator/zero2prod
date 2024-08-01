@@ -1,24 +1,24 @@
-name: Rust
+name: Rust CI
 
 on: [push, pull_request]
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Build
-        run: cargo build --verbose
-
-      - name: Run tests
-        run: cargo test --verbose
-
-      - name: Coveralls GitHub Action
-        uses: coverallsapp/github-action@v2.3.0
+      - uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          toolchain: stable
+      - name: Run tests and generate coverage
+        run: cargo tarpaulin --out Xml
+      - name: Install coveralls-lcov
+        run: npm install -g coveralls-lcov
+      - name: Convert coverage report
+        run: coveralls-lcov -v -n tarpaulin-report.xml > lcov.info
+      - name: Upload to Coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        run: coveralls < lcov.info
