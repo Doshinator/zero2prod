@@ -23,7 +23,6 @@ mod tests {
     }
 }
 
-
 #[cfg(test)]
 mod subtract {
     use crate::subtract;
