@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use actix_web::{get, post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 
 #[get("/")]
@@ -20,7 +21,7 @@ async fn name(req_body: String) -> impl Responder {
 #[get("/health_check")]
 async fn health_check() -> impl Responder {
     HttpResponse::Ok().finish()
-}
+} 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
