@@ -8,7 +8,7 @@ mod tests {
         // Arrange
         let addrs = common::spawn_app();
         let client = reqwest::Client::new();
-        
+
         // Act
         let server = client
             .get(&format!("{}/greeting", &addrs))
