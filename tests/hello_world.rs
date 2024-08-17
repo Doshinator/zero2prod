@@ -1,3 +1,4 @@
+//! tests/hello_world.rs
 mod common;
 
 mod tests {
