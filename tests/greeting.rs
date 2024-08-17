@@ -1,3 +1,4 @@
+//! tests/greeting.rs
 mod common;
 
 mod tests {
