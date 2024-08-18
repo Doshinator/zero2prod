@@ -24,8 +24,18 @@ async fn health_check() -> impl Responder {
 }
 
 #[post("/subscriptions")]
-async fn subscribe() -> impl Responder {
+async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
     HttpResponse::Ok().finish()
+}
+
+#[derive(serde::Deserialize)]
+struct FormData {
+    email: String,
+    name: String,
+}
+
+fn index(form: web::Form<FormData>) -> String {
+    format!("Welcome {}!, Email {}", form.email, form.name)
 }
 
 pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
