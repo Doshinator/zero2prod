@@ -28,8 +28,6 @@ mod tests {
 }
 
 mod subscriber_test {
-    use std::vec;
-
     use crate::common::spawn_app;
     
     #[tokio::test]
@@ -41,7 +39,7 @@ mod subscriber_test {
 
         // Act
         let response = client
-            .post(&format!("{}/scubscriptions", &addrs))
+            .post(&format!("{}/subscriptions", &addrs))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(body)
             .send()
@@ -50,7 +48,6 @@ mod subscriber_test {
         
         // Assert
         assert_eq!(200, response.status().as_u16());
-        assert!(response.status().is_success());
     }
 
     #[tokio::test]
@@ -81,7 +78,6 @@ mod subscriber_test {
                 "The API did not fail with 400 Bad Request when the payload was {}.", 
                 error_message
             );
-            
         }
     }
 }
