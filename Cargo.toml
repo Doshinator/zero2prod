@@ -20,12 +20,24 @@ name = "zero2prod"
 
 [dependencies]
 actix-web = "4"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-# We need the optional `derive` feature to use `serde`'s procedural macros:
-# `#[derive(Serialize)]` and `#[derive(Deserialize)]`.
-# The feature is not enabled by default to avoid pulling in
-# unnecessary dependencies for projects that do not need it.
+tokio = { version = "1", features = ["macros", "rt-multi-thread"]}
 serde = { version = "1", features = ["derive"]}
 
 [dev-dependencies]
 reqwest = "0.11"
+
+[dependencies.sqlx]
+version = "0.6.0"
+default-features = false
+features = [
+    "runtime-actix-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
+]
+
+
+# visit using this dependencies below
+# sqlx = { version = "0.7", default-featuers = false, features = ["runtime-tokio-native-tls", "macros", "postgres", "uuid", "chrono", "migrate"]}
