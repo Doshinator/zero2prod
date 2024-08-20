@@ -26,3 +26,58 @@ mod tests {
         assert_eq!(Some(0), response.content_length());
     }
 }
+
+mod subscriber_test {
+    use crate::common::spawn_app;
+
+    #[tokio::test]
+    async fn subscriber_returns_200_ok() {
+        // Arrange
+        let addrs = spawn_app();
+        let client = reqwest::Client::new();
+        let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
+
+        // Act
+        let response = client
+            .post(&format!("{}/subscriptions", &addrs))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(200, response.status().as_u16());
+    }
+
+    #[tokio::test]
+    async fn subscriber_returns_400_data_missing() {
+        // Arrange
+        let addrs = spawn_app();
+        let client = reqwest::Client::new();
+        let test_cases: Vec<(&str, &str)> = vec![
+            ("name=le%20guin", "missing the email"),
+            ("email=ursula_le_guin%40gmail.com", "missing the name"),
+            ("", "missing both name and email"),
+        ];
+
+        for (invalid_body, error_message) in test_cases {
+            // Act
+            let response = client
+                .post(&format!("{}/subscriptions", &addrs))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .body(invalid_body)
+                .send()
+                .await
+                .expect("Failed to execute request.");
+
+            // Assserts
+            assert_eq!(
+                400,
+                response.status().as_u16(),
+                "The API did not fail with 400 Bad Request when the payload was {}.",
+                error_message
+            );
+        }
+    }
+}

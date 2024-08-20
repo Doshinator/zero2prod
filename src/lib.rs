@@ -1,4 +1,4 @@
-use actix_web::{dev::Server, get, post, App, HttpResponse, HttpServer, Responder};
+use actix_web::{dev::Server, get, post, web, App, HttpResponse, HttpServer, Responder};
 use std::net::TcpListener;
 
 #[get("/")]
@@ -23,6 +23,23 @@ async fn health_check() -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
+#[post("/subscriptions")]
+async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
+    HttpResponse::Ok().finish()
+}
+
+#[allow(dead_code)]
+#[derive(serde::Deserialize)]
+struct FormData {
+    email: String,
+    name: String,
+}
+
+#[allow(dead_code)]
+fn index(form: web::Form<FormData>) -> String {
+    format!("Welcome {}!, Email {}", form.email, form.name)
+}
+
 pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
     let server = HttpServer::new(|| {
         App::new()
@@ -30,6 +47,7 @@ pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
             .service(greeting)
             .service(name)
             .service(health_check)
+            .service(subscribe)
     })
     .listen(listener)?
     .run();
