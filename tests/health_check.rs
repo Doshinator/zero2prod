@@ -29,7 +29,7 @@ mod tests {
 
 mod subscriber_test {
     use crate::common::spawn_app;
-    
+
     #[tokio::test]
     async fn subscriber_returns_200_ok() {
         // Arrange
@@ -45,7 +45,7 @@ mod subscriber_test {
             .send()
             .await
             .expect("Failed to execute request.");
-        
+
         // Assert
         assert_eq!(200, response.status().as_u16());
     }
@@ -58,7 +58,7 @@ mod subscriber_test {
         let test_cases: Vec<(&str, &str)> = vec![
             ("name=le%20guin", "missing the email"),
             ("email=ursula_le_guin%40gmail.com", "missing the name"),
-            ("", "missing both name and email")
+            ("", "missing both name and email"),
         ];
 
         for (invalid_body, error_message) in test_cases {
@@ -73,9 +73,9 @@ mod subscriber_test {
 
             // Assserts
             assert_eq!(
-                400, 
+                400,
                 response.status().as_u16(),
-                "The API did not fail with 400 Bad Request when the payload was {}.", 
+                "The API did not fail with 400 Bad Request when the payload was {}.",
                 error_message
             );
         }

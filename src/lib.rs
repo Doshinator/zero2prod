@@ -1,4 +1,4 @@
-use actix_web::{dev::Server, web, get, post, App, HttpResponse, HttpServer, Responder};
+use actix_web::{dev::Server, get, post, web, App, HttpResponse, HttpServer, Responder};
 use std::net::TcpListener;
 
 #[get("/")]
@@ -28,12 +28,14 @@ async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
+#[allow(dead_code)]
 #[derive(serde::Deserialize)]
 struct FormData {
     email: String,
     name: String,
 }
 
+#[allow(dead_code)]
 fn index(form: web::Form<FormData>) -> String {
     format!("Welcome {}!, Email {}", form.email, form.name)
 }
