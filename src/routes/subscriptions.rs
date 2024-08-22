@@ -17,4 +17,3 @@ fn index(form: web::Form<FormData>) -> String {
 pub async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
     HttpResponse::Ok().finish()
 }
-
