@@ -1,4 +1,7 @@
 //! src/routes/mod.rs
+
+#![allow(unused_variables)]
+#![allow(warnings)]
 mod health_check;
 mod subscriptions;
 mod greeting;

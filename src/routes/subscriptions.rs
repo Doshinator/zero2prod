@@ -1,9 +1,9 @@
 //! src/routes/subscriptions.rs
+#![allow(dead_code)]
 use actix_web::{post, web, HttpResponse, Responder};
 
-#[allow(dead_code)]
 #[derive(serde::Deserialize)]
-struct FormData {
+pub struct FormData {
     email: String,
     name: String,
 }
@@ -14,7 +14,7 @@ fn index(form: web::Form<FormData>) -> String {
 }
 
 #[post("/subscriptions")]
-async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
+pub async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
     HttpResponse::Ok().finish()
 }
 
