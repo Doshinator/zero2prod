@@ -59,7 +59,7 @@ mod subscriber_test {
             .fetch_one(&mut connection)
             .await
             .expect("Failed to fetch saved subscription.");
-        
+
         assert_eq!("ursula_le_guin@gmail.com", saved.email);
         assert_eq!("le guin", saved.name);
     }
