@@ -5,18 +5,18 @@
 mod common;
 
 mod tests {
-    use crate::common;
+    use crate::common::spawn_app;
 
     #[rustfmt::skip]
     #[tokio::test] 
     async fn health_check_success() {
         // Arrange
-        let addrs = common::spawn_app();
+        let app = spawn_app().await;
         let client = reqwest::Client::new();
 
         // Act
         let response = client
-            .get(&format!("{}/health_check", &addrs))
+            .get(&format!("{}/health_check", &app.address))
             .send()
             .await
             .expect("Failed to execute request.");
@@ -29,24 +29,17 @@ mod tests {
 
 mod subscriber_test {
     use crate::common::spawn_app;
-    use sqlx::{Connection, PgConnection};
-    use zero2prod::configuration::get_configuration;
 
     #[tokio::test]
     async fn subscriber_returns_200_ok() {
         // Arrange
-        let addrs = spawn_app();
-        let configuration = get_configuration().expect("Failed to read configuration.");
-        let configuration_string = configuration.database.connection_string();
-        let mut connection = PgConnection::connect(&configuration_string)
-            .await
-            .expect("Failed to connect to Postgres.");
+        let app = spawn_app().await;
         let client = reqwest::Client::new();
         let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
 
         // Act
         let response = client
-            .post(&format!("{}/subscriptions", &addrs))
+            .post(&format!("{}/subscriptions", &app.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(body)
             .send()
@@ -56,7 +49,7 @@ mod subscriber_test {
         // Assert
         assert_eq!(200, response.status().as_u16());
         let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
-            .fetch_one(&mut connection)
+            .fetch_one(&app.db_pool)
             .await
             .expect("Failed to fetch saved subscription.");
 
@@ -67,7 +60,7 @@ mod subscriber_test {
     #[tokio::test]
     async fn subscriber_returns_400_data_missing() {
         // Arrange
-        let addrs = spawn_app();
+        let app = spawn_app().await;
         let client = reqwest::Client::new();
         let test_cases: Vec<(&str, &str)> = vec![
             ("name=le%20guin", "missing the email"),
@@ -78,7 +71,7 @@ mod subscriber_test {
         for (invalid_body, error_message) in test_cases {
             // Act
             let response = client
-                .post(&format!("{}/subscriptions", &addrs))
+                .post(&format!("{}/subscriptions", &app.address))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .body(invalid_body)
                 .send()
