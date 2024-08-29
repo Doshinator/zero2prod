@@ -1,36 +1,45 @@
 //! src/routes/name.rs
-use actix_web::{post, web, HttpResponse, Responder};
+use std::path;
+
+use actix_web::{get, post, web, HttpResponse, Responder};
 use sqlx::PgPool;
 use chrono::Utc; 
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
-pub struct FormData {
+pub struct Subscription {
     email: String,
     name: String,
 }
 
-// // to test post enpoint, in terminal
-// // curl -X POST 127.0.0.1:8000/name -H "Content-Type: plain/text" -d "request body here"
-#[post("/name")]
-pub async fn name(form: web::Form<FormData>, pool: web::Data<PgPool>) -> impl Responder {
+// curl -X GET http://127.0.0.1:8000/name/le%20guin
+// Query result: Record { id: 51dde2ad-a02e-49c6-8c87-9b472a3621da, email: "ursula_le_guin@gmail.com", name: "le guin" }
+#[get("/name/{name}")]
+pub async fn name(
+    path: web::Path<String>, // Extract the `name` parameter from the URL
+    pool: web::Data<PgPool>, // Database connection pool
+) -> impl Responder {
+    let name = path.into_inner(); // Extract the `name` from the path
+
+    // Perform the SQL query
     match sqlx::query!(
         r#"
-        INSERT INTO subscriptions (id, email, name, subscribed_at)
-        VALUES ($1, $2, $3, $4) 
+        SELECT id, email, name
+        FROM subscriptions 
+        WHERE name = $1
         "#,
-        Uuid::new_v4(), 
-        form.email,
-        form.name,
-        Utc::now()
+        name
     )
-    .execute(pool.get_ref())
-    .await 
-    {   
-        Ok(_) => HttpResponse::Ok().finish(), 
+    .fetch_one(pool.get_ref()) // Fetch a single record
+    .await
+    {
+        Ok(record) => {
+            log::info!("Query result: {:?}", record);
+            HttpResponse::Ok().finish()
+        },
         Err(e) => {
             println!("Failed to execute query: {}", e);
-            HttpResponse::InternalServerError().finish() 
+            HttpResponse::InternalServerError().finish() // Return an error if the query fails
         }
     }
 }
