@@ -34,7 +34,13 @@ pub async fn name(
     .await
     {
         Ok(record) => {
-            log::info!("Query result: {:?}", record);
+            let request_span = tracing::info_span!(
+                "Fetching Record",
+                subscriber_name = %record.name,
+                subscriber_email = %record.email,
+            );
+            let _request_span_guard = request_span.enter();
+
             HttpResponse::Ok().finish()
         },
         Err(e) => {
