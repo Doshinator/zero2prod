@@ -18,7 +18,7 @@ pub async fn spawn_app() -> TestApp {
     // port 0 to be able to randomize port assignemnt
     let addrs: &str = "127.0.0.1:0";
     let listener = TcpListener::bind(addrs).expect("failed to bind address");
-        let port = listener.local_addr().unwrap().port();
+    let port = listener.local_addr().unwrap().port();
     let address = format!("http://127.0.0.1:{}", port);
 
     let mut configuration = get_configuration().expect("Failed to read configuration.");

@@ -16,16 +16,16 @@ fn index(form: web::Form<FormData>) -> String {
     format!("Welcome {}!, Email {}", form.email, form.name)
 }
 
-// curl i- -X POST -d 'email=rush5doshi%40gmail.com&name=Doshi' http://127.0.0.1:8000/subscriptions
+// curl -i -X POST -d 'email=rush5doshi%40gmail.com&name=Doshi' http://127.0.0.1:8000/subscriptions
 #[post("/subscriptions")]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> impl Responder {
     let request_id = Uuid::new_v4();
 
     tracing::info!(
         "request_id={} - Adding a new subscriber. name={}, email={}",
-            request_id, 
-            form.name,
-            form.email,
+        request_id, 
+        form.name,
+        form.email,
     );
 
     tracing::info!(
