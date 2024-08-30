@@ -1,8 +1,8 @@
 //! src/routes/subscriptions.rs
 #![allow(dead_code)]
 use actix_web::{post, web, HttpResponse, Responder};
+use chrono::Utc;
 use sqlx::PgPool;
-use chrono::Utc; 
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -29,28 +29,23 @@ fn index(form: web::Form<FormData>) -> String {
 // curl -i -X POST -d 'email=rush5doshi%40gmail.com&name=Doshi' http://127.0.0.1:8000/subscriptions
 #[post("/subscriptions")]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> impl Responder {
-    match insert_subscriber(&form, &pool).await
-    {
+    match insert_subscriber(&form, &pool).await {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }
 
-
 #[tracing::instrument(
-    name = "Saving new subscriber details in the database", 
+    name = "Saving new subscriber details in the database",
     skip(form, pool)
 )]
-pub async fn insert_subscriber(
-    form: &FormData, 
-    pool: &PgPool
-) -> Result<(), sqlx::Error> {
+pub async fn insert_subscriber(form: &FormData, pool: &PgPool) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
         INSERT INTO subscriptions (id, email, name, subscribed_at)
         VALUES ($1, $2, $3, $4) 
         "#,
-        Uuid::new_v4(), 
+        Uuid::new_v4(),
         form.email,
         form.name,
         Utc::now()
