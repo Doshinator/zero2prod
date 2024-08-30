@@ -16,19 +16,6 @@ pub struct DatabaseSettings {
     pub database_name: String,
 }
 
-pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-    // Init config setup
-    let mut settings = config::Config::default();
-
-    // Add configuration values from a file named `configuration`.
-    // It will look for any top-level file with an extension
-    // that `config` knows how to parse: yaml, json, etc.
-    settings.merge(config::File::with_name("configuration"))?;
-
-    // Try convert config values it reads into settings type
-    settings.try_into()
-}
-
 impl DatabaseSettings {
     pub fn connection_string(&self) -> Secret<String> {
         Secret::new(format!(
@@ -50,4 +37,15 @@ impl DatabaseSettings {
             self.port
         ))
     }
+}
+
+pub fn get_configuration() -> Result<Settings, config::ConfigError> {
+    // Init config setup
+    let settings = config::Config::builder()
+        .add_source(config::File::new(
+            "configuration.yaml",
+            config::FileFormat::Yaml,
+        ))
+        .build()?;
+    settings.try_deserialize::<Settings>()
 }

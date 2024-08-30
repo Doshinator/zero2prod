@@ -1,10 +1,6 @@
 //! src/routes/name.rs
-use std::path;
-
 use actix_web::{get, post, web, HttpResponse, Responder};
-use chrono::Utc;
 use sqlx::PgPool;
-use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
 pub struct Subscription {
