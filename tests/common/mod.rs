@@ -5,9 +5,25 @@
 // so this test will fail!!
 
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
-use std::net::TcpListener;
+use zero2prod::startup::run;
+use zero2prod::telemetry::{get_subscriber, init_subscriber};
 use sqlx::{Connection, Executor, PgConnection, PgPool};
+use std::net::TcpListener;
 use uuid::Uuid;
+use once_cell::sync::Lazy;
+
+static TRACING: Lazy<()> = Lazy::new(|| {
+    let default_filter_level = "info".to_string();
+    let subscriber_name = "test".to_string();
+
+    if std::env::var("TEST_LOG").is_ok() {
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
+        init_subscriber(subscriber);
+    } else {
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::sink);
+        init_subscriber(subscriber);
+    };
+});
 
 pub struct TestApp {
     pub address: String,
@@ -15,6 +31,8 @@ pub struct TestApp {
 }
 
 pub async fn spawn_app() -> TestApp {
+    Lazy::force(&TRACING);
+
     // port 0 to be able to randomize port assignemnt
     let addrs: &str = "127.0.0.1:0";
     let listener = TcpListener::bind(addrs).expect("failed to bind address");
@@ -23,11 +41,9 @@ pub async fn spawn_app() -> TestApp {
 
     let mut configuration = get_configuration().expect("Failed to read configuration.");
     configuration.database.database_name = Uuid::new_v4().to_string();
+    let connection_pool = configure_database(&configuration.database).await;
 
-    let connection_pool = configure_database(&configuration.database)
-        .await;
-
-    let server = zero2prod::startup::run(listener, connection_pool.clone())
+    let server = run(listener, connection_pool.clone())
         .expect("Failed to bind address");
     let _ = tokio::spawn(server);
 

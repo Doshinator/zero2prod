@@ -42,7 +42,7 @@ pub async fn name(
             let _request_span_guard = request_span.enter();
 
             HttpResponse::Ok().finish()
-        },
+        }
         Err(e) => {
             println!("Failed to execute query: {}", e);
             HttpResponse::InternalServerError().finish() // Return an error if the query fails
