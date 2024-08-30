@@ -22,12 +22,10 @@ fn index(form: web::Form<FormData>) -> String {
     name = "Adding a new subscriber", 
     skip(form, pool),
     fields(
-        request_id = %Uuid::new_v4(),
         subscriber_email = %form.email,
         subscriber_name= %form.name
     )
 )]
-
 // curl -i -X POST -d 'email=rush5doshi%40gmail.com&name=Doshi' http://127.0.0.1:8000/subscriptions
 #[post("/subscriptions")]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> impl Responder {
