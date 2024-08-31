@@ -79,16 +79,8 @@ jobs:
   clippy:
     name: Linter
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:14
-        env:
-          SQLX_OFFLINE: true
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
+    env:
+      SQLX_OFFLINE: true
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -97,15 +89,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: sqlx-${{ env.SQLX_VERSION }}
-      - name: Install sqlx-cli
-        run:
-          cargo install sqlx-cli
-            --version=${{ env.SQLX_VERSION }}
-            --features ${{ env.SQLX_FEATURES }}
-            --no-default-features
-            --locked
-      - name: Migrate database
-        run: SKIP_DOCKER=true ./scripts/init_db.sh
       - name: Linting
         run: cargo clippy -- -D warnings
 
@@ -122,9 +105,6 @@ jobs:
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
-    container:
-      image: xd009642/tarpaulin
-      options: --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -134,15 +114,7 @@ jobs:
           key: sqlx-${{ env.SQLX_VERSION }}
 
       - name: Install sqlx-cli
-        run:
-          cargo install sqlx-cli
-          --version=${{ env.SQLX_VERSION }}
-          --features ${{ env.SQLX_FEATURES }}
-          --no-default-features
-          --locked
-
-      - name: Migrate database
-        run: SKIP_DOCKER=true ./scripts/init_db.sh
+        run: cargo install sqlx-cli
 
       - name: Generate code coverage
         run: |
