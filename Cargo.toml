@@ -23,7 +23,7 @@ actix-web = "4.5.1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"]}
 serde = "1.0.115"
 config = { version = "0.14", default-features = false, features = ["yaml"] }
-sqlx = { version = "0.8.1", default-features = false, features = [
+sqlx = { version = "0.8", default-features = false, features = [
     "runtime-tokio-rustls",
     "macros",
     "postgres",
