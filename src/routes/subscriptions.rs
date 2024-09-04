@@ -15,6 +15,7 @@ fn index(form: web::Form<FormData>) -> String {
     format!("Welcome {}!, Email {}", form.email, form.name)
 }
 
+#[allow(clippy::async_yields_async)]
 #[tracing::instrument(
     // name can be used to specify the message associated to the function span - if omitted, it defaults to the function name.
     name = "Adding a new subscriber", 
