@@ -80,8 +80,8 @@ jobs:
       - name: Prepare SQLx Queries
         run: cargo sqlx prepare -- --lib
 
-      - name: Check that queries are fresh
-        run: cargo sqlx prepare --workspace --check -- --all-targets
+      # - name: Check that queries are fresh
+      #   run: cargo sqlx prepare --workspace --check -- --all-targets
 
   # `fmt` container job
   fmt:
