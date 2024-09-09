@@ -77,7 +77,7 @@ jobs:
       - name: Run tests
         run: cargo test
 
-      - name: Check that queries are fresh
+      - name: Run SQLx Prepare
         run: cargo sqlx prepare --workspace -- --all-targets
 
   # `fmt` container job
@@ -91,7 +91,7 @@ jobs:
           # Specific to dtolnay/rust-toolchain: Comma-separated string of additional components to install
           components: rustfmt
       - name: Enforce formatting
-        run: cargo fmt --check  
+        run: cargo fmt --check
 
   # 'clippy' container job
   clippy:
