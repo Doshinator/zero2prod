@@ -80,6 +80,9 @@ jobs:
       # - name: Prepare SQLx Queries
       #   run: cargo sqlx prepare -- --lib
 
+      - name: Git add
+        run: git add .sqlx
+
       - name: Check that queries are fresh
         run: cargo sqlx prepare --workspace --check -- --all-targets
 
