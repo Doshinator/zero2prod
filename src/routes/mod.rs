@@ -1,5 +1,4 @@
 //! src/routes/mod.rs
-
 #![allow(unused_variables)]
 #![allow(warnings)]
 mod greeting;

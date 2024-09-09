@@ -2,17 +2,17 @@
 mod common;
 
 mod tests {
-    use crate::common;
+    use crate::common::spawn_app;
 
     #[tokio::test]
     async fn hello_world_success() {
         // Arrange
-        let addrs = common::spawn_app();
+        let app = spawn_app().await;
         let client = reqwest::Client::new();
 
         // Act
         let response = client
-            .get(&format!("{}/ ", &addrs))
+            .get(&format!("{}/ ", &app.address))
             .send()
             .await
             .expect("Failed to execute request.");
