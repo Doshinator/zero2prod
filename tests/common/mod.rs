@@ -25,11 +25,13 @@ static TRACING: LazyLock<()> = LazyLock::new(|| {
     };
 });
 
+#[allow(unused)]
 pub struct TestApp {
     pub address: String,
     pub db_pool: PgPool,
 }
 
+#[allow(unused)]
 pub async fn spawn_app() -> TestApp {
     LazyLock::force(&TRACING);
 
@@ -52,6 +54,7 @@ pub async fn spawn_app() -> TestApp {
     }
 }
 
+#[allow(unused)]
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // Create database
     let mut connection =
