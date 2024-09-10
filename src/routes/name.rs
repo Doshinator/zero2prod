@@ -37,7 +37,7 @@ pub async fn name(
             );
             let _request_span_guard = request_span.enter();
 
-            HttpResponse::Ok().finish()
+            HttpResponse::Ok().body(format!("name={}, email={}", record.name, record.email))
         }
         Err(e) => {
             println!("Failed to execute query: {}", e);
