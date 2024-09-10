@@ -3,7 +3,7 @@ use sqlx::PgPool;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
 
-use crate::routes::{greeting, health_check, hello_world, name, subscribe};
+use crate::routes::{db_health_check, greeting, health_check, hello_world, name, subscribe};
 
 pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Error> {
     let db_pool = Data::new(db_pool);
@@ -15,6 +15,7 @@ pub fn run(listener: TcpListener, db_pool: PgPool) -> Result<Server, std::io::Er
             .service(name)
             .service(health_check)
             .service(subscribe)
+            .service(db_health_check)
             .app_data(db_pool.clone())
     })
     .listen(listener)?
