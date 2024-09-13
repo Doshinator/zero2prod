@@ -1,9 +1,9 @@
 // - if we try to run two or more tests in parallel only one of them will manage to bind the port,
 // all others will fail.
 
+use secrecy::Secret;
 // - if port 8000 is being used by another program on our machine (e.g. our own application!), tests will fail;
 // so this test will fail!!
-use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use std::sync::LazyLock;
@@ -57,17 +57,22 @@ pub async fn spawn_app() -> TestApp {
 #[allow(unused)]
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // Create database
-    let mut connection =
-        PgConnection::connect(&config.connection_string_without_db().expose_secret())
-            .await
-            .expect("Failed to connect to Postgres");
+    let maintenance_settings = DatabaseSettings {
+        database_name: "postgres".to_string(),
+        username: "postgres".to_string(),
+        password: Secret::new("password".to_string()),
+        ..config.clone()
+    };
+    let mut connection = PgConnection::connect_with(&maintenance_settings.connect_option())
+        .await
+        .expect("Failed to connect to Postgres");
     connection
         .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
         .await
         .expect("Failed to create database.");
 
     // Migrate database
-    let connection_pool = PgPool::connect(&config.connection_string().expose_secret())
+    let connection_pool = PgPool::connect_with(config.connect_option())
         .await
         .expect("Failed to connect to Postgres.");
 
