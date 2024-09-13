@@ -2,6 +2,7 @@
 use actix_web::{error::ErrorInternalServerError, get, web::Data, HttpResponse, Responder};
 use sqlx::PgPool;
 
+#[tracing::instrument(name = "Checking DB health", skip(pool))]
 #[get("/db_health_check")]
 pub async fn db_health_check(pool: Data<PgPool>) -> impl Responder {
     match sqlx::query!(
