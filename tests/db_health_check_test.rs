@@ -2,7 +2,7 @@
 mod common;
 
 mod tests {
-    #[allow(dead_code)]
+    #[allow(unused)]
     use crate::common::spawn_app;
     #[tokio::test]
     async fn db_health_check_success() {
