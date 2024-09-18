@@ -56,7 +56,7 @@ mod tests {
     fn a_256_grapheme_long_name_is_valid() {
         // Arrange
         let name = "a".repeat(2);
-        
+
         // Act
         let result = SubscriberName::parse(name);
 
@@ -68,10 +68,10 @@ mod tests {
     fn a_name_longer_than_256_graphemes_is_rejected() {
         // Arrange
         let name = "a".repeat(257);
-         
+
         // Act
         let result = SubscriberName::parse(name);
-        
+
         // Assert
         assert_err!(result);
     }

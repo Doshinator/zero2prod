@@ -8,11 +8,10 @@ impl SubscriberEmail {
     pub fn parse(s: String) -> Result<SubscriberEmail, String> {
         if s.validate_email() {
             Ok(Self(s))
-        } 
-        else {
+        } else {
             Err(format!("{} is not a valid subscriber email.", s))
         }
-    } 
+    }
 }
 
 impl AsRef<str> for SubscriberEmail {
@@ -25,15 +24,15 @@ impl AsRef<str> for SubscriberEmail {
 mod tests {
     use super::SubscriberEmail;
     use claims::assert_err;
-    
+
     #[test]
     fn empty_string_is_rejeted() {
         // Arrange
         let email = "".to_string();
-        
+
         // Act
         let result = SubscriberEmail::parse(email);
-        
+
         // Assert
         assert_err!(result);
     }
@@ -45,7 +44,7 @@ mod tests {
 
         // Act
         let result = SubscriberEmail::parse(email);
-        
+
         // Assert
         assert_err!(result);
     }
@@ -57,7 +56,7 @@ mod tests {
 
         // Act
         let result = SubscriberEmail::parse(email);
-        
+
         // Assert
         assert_err!(result);
     }
