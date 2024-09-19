@@ -12,9 +12,15 @@ pub struct FormData {
     name: String,
 }
 
-#[allow(dead_code)]
-fn index(form: web::Form<FormData>) -> String {
-    format!("Welcome {}!, Email {}", form.email, form.name)
+// trying to convert FormData -> NewSubscriber
+impl TryFrom<FormData> for NewSubscriber {
+    type Error = String;
+
+    fn try_from(value: FormData) -> Result<Self, Self::Error> {
+        let name = SubscriberName::parse(value.name)?;
+        let email = SubscriberEmail::parse(value.email)?;
+        Ok(Self { email, name })
+    }
 }
 
 #[allow(clippy::async_yields_async)]
@@ -30,19 +36,10 @@ fn index(form: web::Form<FormData>) -> String {
 // curl -i -X POST -d 'email=rush5doshi%40gmail.com&name=Doshi' http://127.0.0.1:8000/subscriptions
 #[post("/subscriptions")]
 pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> impl Responder {
-    let email = match SubscriberEmail::parse(form.0.email) {
-        Ok(email) => email,
-        // Return early if the name is invalid, with a 400
+    let new_subscriber = match form.0.try_into() {
+        Ok(form) => form,
         Err(_) => return HttpResponse::BadRequest().finish(),
     };
-
-    let name = match SubscriberName::parse(form.0.name) {
-        Ok(name) => name,
-        // Return early if the name is invalid, with a 400
-        Err(_) => return HttpResponse::BadRequest().finish(),
-    };
-
-    let new_subscriber = NewSubscriber { email, name };
 
     match insert_subscriber(&new_subscriber, &pool).await {
         Ok(_) => HttpResponse::Ok().finish(),
