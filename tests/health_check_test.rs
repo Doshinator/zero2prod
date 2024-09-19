@@ -58,6 +58,35 @@ mod subscriber_test {
     }
 
     #[tokio::test]
+    async fn subscribe_returns_a_400_when_fields_are_present_but_invalid() {
+        let app = spawn_app().await;
+        let client = reqwest::Client::new();
+        let test_cases: Vec<(&str, &str)> = vec![
+            ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+            ("name=Ursula&email=", "empty email"),
+            ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+        ];
+
+        for (body, description) in test_cases {
+            // Arrange & Act
+            let response = client
+                .post(&format!("{}/subscriptions", &app.address))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .body(body)
+                .send()
+                .await
+                .expect("Failed to execute request.");
+            // Asserts
+            assert_eq!(
+                400,
+                response.status().as_u16(),
+                "The API did not return a 400 Bad Request when the payload was {}.",
+                description
+            );
+        }
+    }
+
+    #[tokio::test]
     async fn subscriber_returns_400_data_missing() {
         // Arrange
         let app = spawn_app().await;
@@ -68,7 +97,7 @@ mod subscriber_test {
             ("", "missing both name and email"),
         ];
 
-        for (invalid_body, error_message) in test_cases {
+        for (invalid_body, error_msg) in test_cases {
             // Act
             let response = client
                 .post(&format!("{}/subscriptions", &app.address))
@@ -83,7 +112,7 @@ mod subscriber_test {
                 400,
                 response.status().as_u16(),
                 "The API did not fail with 400 Bad Request when the payload was {}.",
-                error_message
+                error_msg
             );
         }
     }
