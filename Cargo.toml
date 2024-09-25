@@ -42,6 +42,10 @@ tracing-actix-web = "0.7"
 secrecy = { version = "0.8", features = ["serde"] }
 unicode-segmentation = "1.12.0"
 validator = "0.18"
+reqwest = { version = "0.12", default-features = false, features = [
+    "json",
+    "rustls-tls",
+] }
 
 [dev-dependencies]
 quickcheck = "1.0.3"
@@ -49,6 +53,5 @@ quickcheck_macros = "1"
 claims = "0.7"
 fake = "2.9"
 rand = "0.8"
-reqwest = { version = "0.12", features = ["json"] }
 
 
