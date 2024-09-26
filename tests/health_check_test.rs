@@ -7,8 +7,7 @@ mod common;
 mod tests {
     use crate::common::spawn_app;
 
-    #[rustfmt::skip]
-    #[tokio::test] 
+    #[tokio::test]
     async fn health_check_success() {
         // Arrange
         let app = spawn_app().await;
@@ -20,7 +19,7 @@ mod tests {
             .send()
             .await
             .expect("Failed to execute request.");
-    
+
         // Asserts
         assert!(response.status().is_success());
         assert_eq!(Some(0), response.content_length());

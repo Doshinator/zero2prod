@@ -25,6 +25,6 @@ impl EmailClient {
         html_content: &str,
         text_content: &str,
     ) -> Result<(), String> {
-        todo!()
+        Ok(())
     }
 }
