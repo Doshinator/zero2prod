@@ -18,6 +18,7 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
+        // pass mock server uri to our client
         let email_client = EmailClient::new(mock_server.uri(), sender);
 
         Mock::given(any())

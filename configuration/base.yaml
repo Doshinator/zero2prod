@@ -11,4 +11,4 @@ database:
   require_ssl: false
 email_client:
   base_url: "localhost"
-  sender_email: "jobseeking1337@gmail.com"
+  sender_email: "something@gmail.com"
