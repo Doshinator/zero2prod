@@ -3,7 +3,7 @@
 use crate::domain::SubscriberEmail;
 use config::builder;
 use reqwest::Client;
-use secrecy::Secret;
+use secrecy::{ExposeSecret, Secret};
 use serde::{Deserialize, Serialize};
 
 // email client model
@@ -11,7 +11,7 @@ pub struct EmailClient {
     http_client: Client,
     base_url: String,
     sender: SubscriberEmail,
-    // auth_token: Secret<String>
+    auth_token: Secret<String>,
 }
 
 // controller implementations
@@ -19,13 +19,13 @@ impl EmailClient {
     pub fn new(
         base_url: String,
         sender: SubscriberEmail,
-        // auth_token: Secret<String>,
+        auth_token: Secret<String>,
     ) -> Self {
         Self {
             http_client: Client::new(),
             base_url,
             sender,
-            // auth_token
+            auth_token,
         }
     }
 
@@ -35,7 +35,7 @@ impl EmailClient {
         subject: &str,
         html_content: &str,
         text_content: &str,
-    ) -> Result<(), String> {
+    ) -> Result<(), reqwest::Error> {
         let url = format!("{}/messages", self.base_url);
         let request_body = SendEmailRequestBody {
             from: self.sender.as_ref().to_owned(),
@@ -48,8 +48,13 @@ impl EmailClient {
         let builder = self
             .http_client
             .post(&url)
-            .json(&request_body);
-
+            .header(
+                "X-Postmark-Server-Token",
+                self.auth_token.expose_secret()
+            )
+            .json(&request_body)
+            .send()
+            .await?;
         Ok(())
     }
 }

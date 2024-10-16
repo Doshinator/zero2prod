@@ -5,6 +5,9 @@ use sqlx::postgres::{PgConnectOptions, PgSslMode};
 
 use crate::domain::SubscriberEmail;
 
+/**
+ *  MAIN SETTINGS
+ */
 #[derive(serde::Deserialize)]
 pub struct Settings {
     pub database: DatabaseSettings,
@@ -12,6 +15,9 @@ pub struct Settings {
     pub email_client: EmailClientSettings,
 }
 
+/**
+ * DATABASE SETTINGS:
+ */
 #[derive(serde::Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
@@ -21,13 +27,6 @@ pub struct DatabaseSettings {
     pub host: String,
     pub database_name: String,
     pub require_ssl: bool,
-}
-
-#[derive(serde::Deserialize)]
-pub struct ApplicationSettings {
-    #[serde(deserialize_with = "deserialize_number_from_string")]
-    pub port: u16,
-    pub host: String,
 }
 
 impl DatabaseSettings {
@@ -106,10 +105,24 @@ impl TryFrom<String> for Environment {
     }
 }
 
+/**
+ * APPLICATION SETTINGS:
+ */
+#[derive(serde::Deserialize)]
+pub struct ApplicationSettings {
+    #[serde(deserialize_with = "deserialize_number_from_string")]
+    pub port: u16,
+    pub host: String,
+}
+
+/**
+ * EMAIL SETTINGS:
+ */
 #[derive(serde::Deserialize)]
 pub struct EmailClientSettings {
     pub base_url: String,
     pub sender_email: String,
+    pub auth_token: Secret<String>,
 }
 
 impl EmailClientSettings {

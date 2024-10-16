@@ -8,8 +8,9 @@ mod tests {
             internet::en::SafeEmail,
             lorem::en::{Paragraph, Sentence},
         },
-        Fake,
+        Fake, Faker,
     };
+    use secrecy::Secret;
     use wiremock::{matchers::any, Mock, MockServer, ResponseTemplate};
     use zero2prod::{domain::SubscriberEmail, email_client::EmailClient};
 
@@ -19,7 +20,7 @@ mod tests {
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
         // pass mock server uri to our client
-        let email_client = EmailClient::new(mock_server.uri(), sender);
+        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
 
         Mock::given(any())
             .respond_with(ResponseTemplate::new(200))
