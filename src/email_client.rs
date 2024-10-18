@@ -38,11 +38,11 @@ impl EmailClient {
     ) -> Result<(), reqwest::Error> {
         let url = format!("{}/messages", self.base_url);
         let request_body = SendEmailRequestBody {
-            from: self.sender.as_ref().to_owned(),
-            to: recepient.as_ref().to_owned(),
-            subject: subject.to_owned(),
-            html_body: html_content.to_owned(),
-            text: text_content.to_owned(),
+            from: self.sender.as_ref(),
+            to: recepient.as_ref(),
+            subject: subject,
+            html_body: html_content,
+            text: text_content,
         };
 
         let builder = self
@@ -62,10 +62,10 @@ impl EmailClient {
 // json request body for email request
 #[derive(serde::Serialize)]
 #[serde(rename_all = "PascalCase")]
-struct SendEmailRequestBody {
-    from: String,
-    to: String,
-    subject: String,
-    html_body: String,
-    text: String,
+struct SendEmailRequestBody<'a> {
+    from: &'a str,
+    to: &'a str,
+    subject: &'a str,
+    html_body: &'a str,
+    text: &'a str,
 }
