@@ -61,6 +61,7 @@ impl EmailClient {
 
 // json request body for email request
 #[derive(serde::Serialize)]
+#[serde(rename_all = "PascalCase")]
 struct SendEmailRequestBody {
     from: String,
     to: String,
