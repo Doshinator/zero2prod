@@ -1,10 +1,12 @@
 //! src/email_client.rs
 
 use crate::domain::SubscriberEmail;
+use actix_web::rt::time;
 use config::builder;
-use reqwest::Client;
+use reqwest::{Client, ClientBuilder};
 use secrecy::{ExposeSecret, Secret};
 use serde::{Deserialize, Serialize};
+use tokio::time::timeout;
 
 // email client model
 pub struct EmailClient {
@@ -20,9 +22,11 @@ impl EmailClient {
         base_url: String,
         sender: SubscriberEmail,
         auth_token: Secret<String>,
+        timeout: std::time::Duration
     ) -> Self {
+        let http_client = Client::builder().timeout(timeout).build().unwrap();
         Self {
-            http_client: Client::new(),
+            http_client,
             base_url,
             sender,
             auth_token,

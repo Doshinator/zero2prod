@@ -120,6 +120,11 @@ mod tests {
     }
 
     fn email_client(base_uri: String) -> EmailClient {
-        EmailClient::new(base_uri, email(),  Secret::new(Faker.fake()))
+        EmailClient::new(
+            base_uri,
+            email(),
+            Secret::new(Faker.fake()),
+            std::time::Duration::from_millis(200)
+        )
     }
 }
