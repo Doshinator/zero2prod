@@ -53,8 +53,9 @@ impl EmailClient {
                 self.auth_token.expose_secret()
             )
             .json(&request_body)
-            .send()
-            .await?;
+            .send() // send returns Ok as long as it gets a valid response from the serve, no matter the status code
+            .await?
+            .error_for_status()?;
         Ok(())
     }
 }
