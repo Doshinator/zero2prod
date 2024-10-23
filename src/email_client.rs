@@ -1,12 +1,8 @@
 //! src/email_client.rs
 
 use crate::domain::SubscriberEmail;
-use actix_web::rt::time;
-use config::builder;
-use reqwest::{Client, ClientBuilder};
+use reqwest::Client;
 use secrecy::{ExposeSecret, Secret};
-use serde::{Deserialize, Serialize};
-use tokio::time::timeout;
 
 // email client model
 pub struct EmailClient {
@@ -22,7 +18,7 @@ impl EmailClient {
         base_url: String,
         sender: SubscriberEmail,
         auth_token: Secret<String>,
-        timeout: std::time::Duration
+        timeout: std::time::Duration,
     ) -> Self {
         let http_client = Client::builder().timeout(timeout).build().unwrap();
         Self {
@@ -49,13 +45,9 @@ impl EmailClient {
             text: text_content,
         };
 
-        let builder = self
-            .http_client
+        self.http_client
             .post(&url)
-            .header(
-                "X-Postmark-Server-Token",
-                self.auth_token.expose_secret()
-            )
+            .header("X-Postmark-Server-Token", self.auth_token.expose_secret())
             .json(&request_body)
             .send() // send returns Ok as long as it gets a valid response from the serve, no matter the status code
             .await?

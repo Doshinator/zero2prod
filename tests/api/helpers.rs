@@ -1,6 +1,4 @@
-// - if we try to run two or more tests in parallel only one of them will manage to bind the port,
-// all others will fail.
-
+//! tests/api/helpers.rs
 use secrecy::Secret;
 // - if port 8000 is being used by another program on our machine (e.g. our own application!), tests will fail;
 // so this test will fail!!
@@ -26,13 +24,11 @@ static TRACING: LazyLock<()> = LazyLock::new(|| {
     };
 });
 
-#[allow(unused)]
 pub struct TestApp {
     pub address: String,
     pub db_pool: PgPool,
 }
 
-#[allow(unused)]
 pub async fn spawn_app() -> TestApp {
     LazyLock::force(&TRACING);
 
@@ -69,8 +65,7 @@ pub async fn spawn_app() -> TestApp {
     }
 }
 
-#[allow(unused)]
-pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
+async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // Create database
     let maintenance_settings = DatabaseSettings {
         database_name: "postgres".to_string(),

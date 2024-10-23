@@ -2,14 +2,14 @@
 
 #[cfg(test)]
 mod tests {
-    use claims::{assert_ok, assert_err};
+    use claims::{assert_err, assert_ok};
     use fake::faker::internet::en::SafeEmail;
     use fake::faker::lorem::en::{Paragraph, Sentence};
     use fake::{Fake, Faker};
     use secrecy::Secret;
     use wiremock::matchers::{any, header, header_exists, method, path};
     use wiremock::{Mock, MockServer, Request, ResponseTemplate};
-    
+
     use zero2prod::{domain::SubscriberEmail, email_client::EmailClient};
 
     // Custom matcher to use in Mock to check if body is valid json & contains set of field names
@@ -27,8 +27,7 @@ mod tests {
                     && body.get("Subject").is_some()
                     && body.get("HtmlBody").is_some()
                     && body.get("Text").is_some()
-            }
-            else {
+            } else {
                 false
             }
         }
@@ -65,12 +64,12 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let email_client = email_client(mock_server.uri());
-    
+
         Mock::given(any())
-        .respond_with(ResponseTemplate::new(200))
-        .expect(1)
-        .mount(&mock_server)
-        .await;
+            .respond_with(ResponseTemplate::new(200))
+            .expect(1)
+            .mount(&mock_server)
+            .await;
 
         // Act
         let result = email_client
@@ -106,6 +105,29 @@ mod tests {
         assert_err!(result);
     }
 
+    #[tokio::test]
+    async fn send_email_times_out_if_the_server_takes_too_long() {
+        // Arrange
+        let mock_server = MockServer::start().await;
+        let email_client = email_client(mock_server.uri());
+
+        let response = ResponseTemplate::new(200).set_delay(std::time::Duration::from_secs(180));
+
+        Mock::given(any())
+            .respond_with(response)
+            .expect(1)
+            .mount(&mock_server)
+            .await;
+
+        // Act
+        let result = email_client
+            .send_email(email(), &subject(), &content(), &content())
+            .await;
+
+        // Asserts
+        assert_err!(result);
+    }
+
     // Helper functions
     fn subject() -> String {
         Sentence(1..2).fake()
@@ -124,7 +146,7 @@ mod tests {
             base_uri,
             email(),
             Secret::new(Faker.fake()),
-            std::time::Duration::from_millis(200)
+            std::time::Duration::from_millis(200),
         )
     }
 }
