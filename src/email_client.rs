@@ -40,7 +40,7 @@ impl EmailClient {
         let request_body = SendEmailRequestBody {
             from: self.sender.as_ref(),
             to: recepient.as_ref(),
-            subject: subject,
+            subject,
             html_body: html_content,
             text: text_content,
         };
